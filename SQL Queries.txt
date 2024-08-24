@@ -1,0 +1,279 @@
+Normal Query :
+
+
+1. List all airports in a Mumbai:
+
+SELECT * FROM AIRPORT WHERE CITY = 'Mumbai';
+
+
+2.List all airlines operating in a Sardar Vallabhbhai Patel International Airport:
+
+SELECT * FROM AIRLINE WHERE AIRPORT_NAME = 'Sardar Vallabhbhai Patel International Airport';
+
+
+3. List all flights departing from a Mumbai (Chhatrapati Shivaji Maharaj International Airport):
+
+SELECT * FROM FLIGHT WHERE SOURCE = 'Mumbai';
+
+
+4. List all flights arriving at a Goa (Goa International Airport):
+
+SELECT * FROM FLIGHT WHERE DESTINATION = 'Goa';
+
+
+5. List all passengers on a Flight Number - 1003:
+
+SELECT * FROM PASSENGER WHERE FLIGHT_NO = 1003;
+
+
+6. List all tickets booked for a Passport Number - HI890123 :
+
+SELECT * FROM TICKET WHERE PASSPORT_NO = 'HI890123';
+
+
+7. List all employees working at Maharishi Valmiki International Airport:
+
+SELECT * FROM EMPLOYEE WHERE AIRPORT_NAME = 'Maharishi Valmiki International Airport';
+
+
+8. List all passengers served by an Employee(Employee ID - 100055) :
+
+SELECT * 
+FROM PASSENGER 
+WHERE PASSPORT_NO IN 
+(
+	SELECT PASSPORT_NO 
+	FROM SERVES 
+	WHERE E_ID = 100055
+);
+
+
+9. SELECT NAME, ADDRESS, AGE, SEX WHERE CITY IS Mumbai or Delhi
+
+SELECT E.NAME, E.ADDRESS, E.AGE, E.SEX
+FROM EMPLOYEE E
+WHERE E.AIRPORT_NAME IN 
+(SELECT A.AIRPORT_NAME
+FROM AIRPORT A
+WHERE A.CITY IN ('Mumbai', 'New Delhi')
+);
+
+
+10. Select Flight Number, Airline ID, Airline Name, Source, Destination whose Duration is greater than 1.5 hours, and Destination is Delhi or Mumbai.
+ 
+select F.FLIGHT_NO, AL.AIRLINE_ID, F.SOURCE, F.DESTINATION
+from FLIGHT F, AIRLINE AL
+where (F.DURATION >= 90) AND F.DESTINATION in ('Mumbai','New Delhi') AND AL.AIRLINE_ID = F.AIRLINE_ID;
+
+
+11.  SELECT PASSENGER NAME HAVING MULTIPLE PHONE NUMBERS:
+
+SELECT P.NAME 
+FROM PASSENGER P
+WHERE P.PASSPORT_NO IN 
+(SELECT PPN.PASSPORT_NO 
+FROM PASSENGER_PHONE_NO PPN
+GROUP BY PPN.PASSPORT_NO
+HAVING COUNT(*)>1);
+
+
+12.  List all employees along with their respective airport names and cities:
+
+SELECT E.NAME, E.ADDRESS, E.AGE, E.SEX, A.AIRPORT_NAME, A.CITY
+FROM EMPLOYEE E
+JOIN AIRPORT A 
+ON E.AIRPORT_NAME = A.AIRPORT_NAME;
+
+
+13.find the average salary of employees in each city where the airport is located
+
+SELECT A.CITY, AVG(E.SALARY) AS AVERAGE_SALARY 
+FROM  AIRPORT A 
+JOIN EMPLOYEE E 
+ON A.AIRPORT_NAME = E.AIRPORT_NAME 
+GROUP BY A.CITY;
+
+
+14. SELECT NAME, PASSPORT NUMBER OF PASSENGERS WHERE CLASS IS Business :
+
+SELECT P.NAME, P.PASSPORT_NO 
+FROM PASSENGER P
+WHERE P.TICKET_NO IN
+(SELECT T.TICKET_NO 
+FROM TICKET T 
+WHERE T.CLASS = 'Business');
+
+
+15.SELECT PASSENGER NAME, SEX, TICKET NUMBER HAVING FLIGHT DESTINATION AS New Delhi :
+
+SELECT P.NAME, P.SEX, P.TICKET_NO
+FROM PASSENGER P 
+WHERE P.FLIGHT_NO IN
+(SELECT F.FLIGHT_NO 
+FROM FLIGHT F
+WHERE F.DESTINATION = 'New Delhi');
+
+
+16. List all employees along with their respective airport names and cities
+
+SELECT E.NAME, E.ADDRESS, E.AGE, E.SEX, A.AIRPORT_NAME, A.CITY
+FROM EMPLOYEE E
+JOIN AIRPORT A 
+ON E.AIRPORT_NAME = A.AIRPORT_NAME;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SUBQUERY : 
+
+
+**1. Subquery to find all flights operated by Air India:
+
+SELECT * 
+FROM FLIGHT
+WHERE AIRLINE_ID IN
+(
+
+
+
+
+
+
+
+
+
+	SELECT AIRLINE_ID 
+	FROM AIRLINE 
+	WHERE AIRLINE_NAME = 'Air India'
+);
+
+2. Subquery to find all passengers who booked tickets for flights departing from New Delhi :
+
+SELECT * 
+FROM PASSENGER 
+WHERE FLIGHT_NO IN 
+(
+	SELECT FLIGHT_NO 
+	FROM FLIGHT 
+	WHERE SOURCE = 'New Delhi'
+);
+
+
+3. Subquery to find all flights with a duration longer than the average flight duration :
+
+SELECT * 
+FROM FLIGHT 
+WHERE DURATION > 
+(
+	SELECT AVG(DURATION) 
+	FROM FLIGHT
+);
+
+
+4. Subquery to find all employees working at airports located in Gujarat :
+
+SELECT * 
+FROM EMPLOYEE 
+WHERE AIRPORT_NAME IN 
+(
+	SELECT AIRPORT_NAME 
+	FROM AIRPORT 
+	WHERE STATE = 'Gujarat'
+);
+
+5. Subquery to find all passengers who booked tickets for flights operated by Indigo:
+
+SELECT *
+FROM PASSENGER
+WHERE TICKET_NO IN 
+(
+    	SELECT TICKET_NO
+    	FROM TICKET
+    	WHERE FLIGHT_NO IN 
+	(
+        	SELECT FLIGHT_NO
+        	FROM FLIGHT
+        	WHERE AIRLINE_ID IN 
+		(
+            		SELECT AIRLINE_ID
+            		FROM AIRLINE
+            		WHERE AIRLINE_NAME = 'IndiGo'
+        	)
+    	)
+);
+
+6. Subquery to find all flights with a duration longer than the average flight duration for SpiceJet:
+
+SELECT *
+FROM FLIGHT
+WHERE DURATION > 
+(
+    	SELECT AVG(DURATION)
+    	FROM FLIGHT
+    	WHERE AIRLINE_ID IN 
+	(
+        	SELECT AIRLINE_ID
+        	FROM AIRLINE
+        	WHERE AIRLINE_NAME = 'SpiceJet'
+    	)
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Advanced concept : 
+
+
+
+1. Query Optimization:
+
+
+-- EXPLAIN PLAN
+
+EXPLAIN PLAN FOR
+SELECT * FROM FLIGHT WHERE SOURCE = 'Mumbai' AND DESTINATION = 'New Delhi';
+
+-- PLAN_TABLE
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+
+
+2. Role-Based Access Control (RBAC):
+
+
+CREATE ROLE Admin;
+GRANT SELECT, INSERT, UPDATE, DELETE ON FLIGHT TO Admin;
+
